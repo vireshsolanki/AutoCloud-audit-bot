@@ -558,20 +558,6 @@ with styled, structured data per AWS resource type.
 
 ---
 
-## 🔧 Requirements
-
-These are listed in `requirements.txt`:
-
-```
-boto3
-botocore
-PyQt5
-pwinput
-openpyxl  # (if using for Excel output)
-```
-
----
-
 ## 📌 Roadmap
 
 * [x] EC2 Audit
