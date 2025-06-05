@@ -1,10 +1,10 @@
 from datetime import datetime, timezone, timedelta
 import boto3
 
-def check_idle_ec2_instances(session, region, idle_days=7):
+def check_idle_ec2_instances(session, region, idle_days=7, cpu_threshold=5, network_threshold=1000):
     ec2 = session.client('ec2', region_name=region)
+    cloudwatch = session.client('cloudwatch', region_name=region)
     now = datetime.now(timezone.utc)
-    threshold = timedelta(days=idle_days)
     idle_instances = []
 
     try:
@@ -15,22 +15,71 @@ def check_idle_ec2_instances(session, region, idle_days=7):
                 state = instance['State']['Name']
                 launch_time = instance['LaunchTime']
                 name = next((tag['Value'] for tag in instance.get('Tags', []) if tag['Key'] == 'Name'), 'N/A')
-                idle_time = now - launch_time
 
-                if state == 'stopped' or (state == 'running' and idle_time > threshold):
+                if state == 'terminated':
+                    continue  # Skip terminated instances
+                
+                # If instance is stopped, consider it idle immediately
+                if state == 'stopped':
                     idle_instances.append({
                         'Resource ID': instance_id,
                         'Name': name,
                         'State': state,
                         'Launch Time': str(launch_time),
-                        'Idle Days': idle_time.days,
+                        'Idle Days': idle_days,
+                        'CPU Avg (%)': 0.0,
+                        'NetworkOut Avg (Bytes)': 0.0,
                         'Used?': 'No',
-                        'Suggestion': 'Review and consider stopping or terminating.'
+                        'Suggestion': 'Instance is stopped. Consider terminating if not needed.'
                     })
+                    continue
+
+                # For running or other states, check CloudWatch metrics
+                cpu_util = get_average_metric(cloudwatch, instance_id, 'CPUUtilization', idle_days, now)
+                network_out = get_average_metric(cloudwatch, instance_id, 'NetworkOut', idle_days, now)
+
+                is_idle = cpu_util < cpu_threshold and network_out < network_threshold
+
+                if is_idle:
+                    idle_instances.append({
+                        'Resource ID': instance_id,
+                        'Name': name,
+                        'State': state,
+                        'Launch Time': str(launch_time),
+                        'Idle Days': idle_days,
+                        'CPU Avg (%)': cpu_util,
+                        'NetworkOut Avg (Bytes)': network_out,
+                        'Used?': 'No',
+                        'Suggestion': 'Review and consider stopping or terminating due to low usage.'
+                    })
+
     except Exception as e:
         print(f"[Error] EC2 Check: {e}")
 
     return idle_instances
+
+
+def get_average_metric(cloudwatch_client, instance_id, metric_name, days, end_time):
+    start_time = end_time - timedelta(days=days)
+    try:
+        response = cloudwatch_client.get_metric_statistics(
+            Namespace='AWS/EC2',
+            MetricName=metric_name,
+            Dimensions=[{'Name': 'InstanceId', 'Value': instance_id}],
+            StartTime=start_time,
+            EndTime=end_time,
+            Period=86400,  # 1 day in seconds
+            Statistics=['Average']
+        )
+        datapoints = response.get('Datapoints', [])
+        if not datapoints:
+            return 0.0
+        # Calculate average across datapoints
+        avg = sum(dp['Average'] for dp in datapoints) / len(datapoints)
+        return avg
+    except Exception as e:
+        print(f"[Error] CloudWatch metric {metric_name} for {instance_id}: {e}")
+        return 0.0
 
 
 def check_available_volumes(session, region):
