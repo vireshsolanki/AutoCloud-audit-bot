@@ -13,6 +13,10 @@ from modules.compute_modules.ec2_checker import (
     check_old_amis,
     check_unassociated_elastic_ips,
     check_orphan_snapshots,
+    check_unattached_enis,
+    check_reserved_instance_utilization,
+    check_instance_store_backed_amis,
+    report_running_instance_costs,
 )
 from utils.excel_writer import save_report
 
@@ -113,6 +117,23 @@ def scan_resources_with_spinner(session, region, ami_days):
     with yaspin(text="Checking orphan snapshots...", color="cyan") as spinner:
         resource_data["Snapshots - Orphaned"] = check_orphan_snapshots(session, region)
         spinner.ok("✅")
+    
+    with yaspin(text="Checking unattached ENIs...", color="cyan") as spinner:
+        resource_data["ENIs - Unattached"] = check_unattached_enis(session, region)
+        spinner.ok("✅")
+
+    with yaspin(text="Checking reserved instance utilization...", color="cyan") as spinner:
+        resource_data["Reserved Instances - Underutilized"] = check_reserved_instance_utilization(session, region)
+        spinner.ok("✅")
+
+    with yaspin(text="Checking instance store-backed AMIs...", color="cyan") as spinner:
+        resource_data["AMIs - Instance Store Backed"] = check_instance_store_backed_amis(session, region)
+        spinner.ok("✅")
+
+    with yaspin(text="Reporting running instance costs...", color="cyan") as spinner:
+        resource_data["Running Instance Costs"] = report_running_instance_costs(session, region)
+        spinner.ok("✅")
+
 
     return resource_data
 
