@@ -62,8 +62,11 @@ def write_resource_sheet(wb, resource_name, data):
 
 def save_report(filename, resource_data_map):
     wb = Workbook()
-    wb.remove(wb.active)
+    wb.remove(wb.active)  # Remove default sheet
+
     for resource_name, data in resource_data_map.items():
-        write_resource_sheet(wb, resource_name, data)
+        if data:  # Only create sheet if data is not empty
+            write_resource_sheet(wb, resource_name, data)
+
     wb.save(filename)
-    print(f"\n Report saved as: {filename}")
+    print(f"\nReport saved as: {filename}")
