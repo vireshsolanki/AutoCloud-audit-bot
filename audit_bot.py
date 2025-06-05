@@ -78,8 +78,8 @@ def connect_to_aws(access_key, secret_key, region):
         username = extract_username_from_arn(identity.get('Arn', 'Unknown'))
 
         print(f"\nConnected to AWS successfully!")
-        print(f" Account: {identity.get('Account')}")
-        print(f" User:    {username}\n")
+        # print(f" Account: {identity.get('Account')}")
+        # print(f" User:    {username}\n")
 
         return session, username
 
