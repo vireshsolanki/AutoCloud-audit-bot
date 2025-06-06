@@ -1,34 +1,40 @@
+````markdown
+# AutoCloud Audit Bot
 
 ## 📌 Overview
 
 The **AutoCloud Audit Bot** is a command-line + GUI hybrid Python tool designed to analyze your AWS account for **unused or idle resources**. It connects to your AWS account (with read-only permissions) and scans for:
 
-✅ **Idle EC2 Instances**
-✅ **Unattached EBS Volumes**
-✅ **Old AMIs**
-✅ **Unassociated Elastic IPs**
-✅ **Orphan Snapshots**
+✅ **Idle EC2 Instances** (with improved unused detection)  
+✅ **Unattached EBS Volumes**  
+✅ **Old AMIs**  
+✅ **Unassociated Elastic IPs**  
+✅ **Orphan Snapshots**  
+✅ **Unused or idle Lambda functions** (newly added compute module)
 
-Currently, **EC2 analysis is fully implemented**. Other modules are under development and will be expanded in future versions.
+Currently, **EC2 analysis and Lambda module are fully implemented**. Other modules are under development and will be expanded in future versions.
 
 ---
 
 ## ⚠️ Development Status
 
-* ✅ EC2 Module — Fully implemented
-* 📇 EBS, AMI, EIP, and Snapshot — In progress
-* 🧪 Excel export is implemented using styled formatting
+* ✅ EC2 Module — Fully implemented with better unused instance identification  
+* ✅ Lambda Module — Newly added for compute resource analysis  
+* 📇 EBS, AMI, EIP, and Snapshot — In progress  
+* 🧪 Excel export is implemented using styled formatting  
 * 🧰 GUI directory picker using **PyQt5** (cross-platform)
 
 ---
 
 ## ⚙️ Features
 
-* 📆 Generates a report in `.xlsx` format
-* 🎨 Excel reports have clean formatting
-* 🤝 Supports custom output directory selection (GUI)
-* 🔐 Uses secure input for credentials via `pwinput`
-* 💻 CLI-driven with OS-native GUI directory picker
+* 📆 Generates a report in `.xlsx` format  
+* 🎨 Excel reports have clean formatting  
+* 🤝 Supports custom output directory selection (GUI)  
+* 🔐 Uses secure input for credentials via `pwinput`  
+* 💻 CLI-driven with OS-native GUI directory picker  
+* ⚙️ Detects unused EC2 instances more accurately using usage patterns and idle thresholds  
+* ⚙️ Audits Lambda functions for usage, concurrency, errors, and configuration suggestions  
 
 ---
 
@@ -36,8 +42,8 @@ Currently, **EC2 analysis is fully implemented**. Other modules are under develo
 
 Make sure you have:
 
-* Python **3.8+**
-* AWS **IAM Read-Only** access credentials
+* Python **3.8+**  
+* AWS **IAM Read-Only** access credentials  
 * pip and virtual environment setup (recommended)
 
 ---
@@ -49,7 +55,7 @@ Make sure you have:
 ```bash
 git clone https://github.com/your-username/aws-resource-analyzer-bot.git
 cd aws-resource-analyzer-bot
-```
+````
 
 2. **Create & Activate Virtual Environment**
 
@@ -90,7 +96,7 @@ A report file like:
 cloud_audit_report.xlsx
 ```
 
-with styled, structured data per AWS resource type.
+with styled, structured data per AWS resource type, including EC2 and Lambda audit results.
 
 ---
 
@@ -104,11 +110,11 @@ with styled, structured data per AWS resource type.
 
 ## 📌 Roadmap
 
-* [x] EC2 Audit
+* [x] EC2 Audit (improved unused instance detection)
+* [x] Lambda Audit Module (compute resource analysis)
 * [x] Excel Export
 * [x] GUI Output Path Picker
 * [ ] S3 Bucket Audit
-* [ ] Lambda Cleanup Checks
 * [ ] Multi-region Support
 * [ ] CLI argument support
 
@@ -129,3 +135,5 @@ MIT License © 2025
 ## ✉️ Contact
 
 Have feedback or feature requests? Open an issue or ping \[[vireshsolanki1027@gmail.com](mailto:vireshsolanki1027@gmail.com)].
+
+```

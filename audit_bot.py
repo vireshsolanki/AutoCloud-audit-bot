@@ -19,6 +19,7 @@ from modules.compute_modules.ec2_checker import (
     report_running_instance_costs,
 )
 from utils.excel_writer import save_report
+from modules.compute_modules.lambda_checker import audit_lambda_functions
 
 
 # Ctrl+C clean exit
@@ -132,6 +133,10 @@ def scan_resources_with_spinner(session, region, ami_days):
 
     with yaspin(text="Reporting running instance costs...", color="cyan") as spinner:
         resource_data["Running Instance Costs"] = report_running_instance_costs(session, region)
+        spinner.ok("✅")
+    with yaspin(text="Auditing Lambda functions...", color="cyan") as spinner:
+        lambda_results = audit_lambda_functions(session, region)
+        resource_data["Lambda - Functions"] = lambda_results
         spinner.ok("✅")
 
 
