@@ -1,139 +1,144 @@
-````markdown
-# AutoCloud Audit Bot
+🛡️ AutoCloud Audit Bot
+📌 Overview
+AutoCloud Audit Bot is a hybrid command-line + GUI Python tool designed to analyze your AWS account for unused or idle resources. It connects using read-only IAM credentials and scans for:
 
-## 📌 Overview
+✅ Idle EC2 Instances (with improved unused detection)
 
-The **AutoCloud Audit Bot** is a command-line + GUI hybrid Python tool designed to analyze your AWS account for **unused or idle resources**. It connects to your AWS account (with read-only permissions) and scans for:
+✅ Unattached EBS Volumes
 
-✅ **Idle EC2 Instances** (with improved unused detection)  
-✅ **Unattached EBS Volumes**  
-✅ **Old AMIs**  
-✅ **Unassociated Elastic IPs**  
-✅ **Orphan Snapshots**  
-✅ **Unused or idle Lambda functions** (newly added compute module)
+✅ Old AMIs
 
-Currently, **EC2 analysis and Lambda module are fully implemented**. Other modules are under development and will be expanded in future versions.
+✅ Unassociated Elastic IPs
 
----
+✅ Orphan Snapshots
 
-## ⚠️ Development Status
+✅ Unused or Idle Lambda Functions (new compute module)
 
-* ✅ EC2 Module — Fully implemented with better unused instance identification  
-* ✅ Lambda Module — Newly added for compute resource analysis  
-* 📇 EBS, AMI, EIP, and Snapshot — In progress  
-* 🧪 Excel export is implemented using styled formatting  
-* 🧰 GUI directory picker using **PyQt5** (cross-platform)
+🔍 Currently implemented: EC2 and Lambda modules
+📦 More modules are under development and will be added soon!
 
----
+⚙️ Features
+📆 Generates audit reports in .xlsx format
 
-## ⚙️ Features
+🎨 Well-formatted Excel output using styled formatting
 
-* 📆 Generates a report in `.xlsx` format  
-* 🎨 Excel reports have clean formatting  
-* 🤝 Supports custom output directory selection (GUI)  
-* 🔐 Uses secure input for credentials via `pwinput`  
-* 💻 CLI-driven with OS-native GUI directory picker  
-* ⚙️ Detects unused EC2 instances more accurately using usage patterns and idle thresholds  
-* ⚙️ Audits Lambda functions for usage, concurrency, errors, and configuration suggestions  
+📁 GUI output folder picker using PyQt5
 
----
+🔐 Secure credential entry using pwinput
 
-## 🧰 Prerequisites
+🧠 Improved idle EC2 detection via usage patterns
 
-Make sure you have:
+⚙️ Audits Lambda usage, concurrency, errors, and configuration suggestions
 
-* Python **3.8+**  
-* AWS **IAM Read-Only** access credentials  
-* pip and virtual environment setup (recommended)
+🛠️ Development Status
+Module	Status
+EC2 Audit	✅ Fully implemented
+Lambda Audit	✅ Implemented
+EBS Volumes	🚧 In progress
+AMIs	🚧 In progress
+Elastic IPs	🚧 In progress
+Snapshots	🚧 In progress
+Excel Export	✅ Styled report output
+GUI Folder Picker	✅ Cross-platform GUI
 
----
+🧰 Prerequisites
+Ensure you have the following:
 
-## 📥 Installation
+Python 3.8+
 
-1. **Clone the Repository**
+AWS IAM Read-Only Access credentials
 
-```bash
+pip and Python virtual environment setup (recommended)
+
+📥 Installation
+Clone the Repository
+
+bash
+Copy
+Edit
 git clone https://github.com/your-username/aws-resource-analyzer-bot.git
 cd aws-resource-analyzer-bot
-````
+Create & Activate Virtual Environment
 
-2. **Create & Activate Virtual Environment**
-
-```bash
+bash
+Copy
+Edit
 python3 -m venv venv
-source venv/bin/activate      # On Windows: venv\Scripts\activate
-```
+source venv/bin/activate        # On Windows: venv\Scripts\activate
+Install Dependencies
 
-3. **Install Dependencies**
-
-```bash
+bash
+Copy
+Edit
 pip install -r requirements.txt
-```
+🚀 Usage
+Run the bot:
 
----
-
-## 🚀 How to Use
-
-```bash
+bash
+Copy
+Edit
 python audit_bot.py
-```
+Follow the steps:
 
-1. Provide your AWS **Access Key**, **Secret Key**, and **Region**
-2. Choose the thresholds for:
+Provide AWS Access Key, Secret Key, and Region
 
-   * Idle EC2 days (default: 7)
-   * AMI age (default: 30)
-3. Select the **output folder** using the GUI popup
-4. Receive your Excel report: `cloud_audit_report.xlsx`
+Set thresholds:
 
----
+Idle EC2 days (default: 7)
 
-## 📂 Output
+AMI age in days (default: 30)
 
-A report file like:
+Choose an output folder using the GUI popup
 
-```
+Your report will be saved as:
+
+Copy
+Edit
 cloud_audit_report.xlsx
-```
+📂 Output Example
+File: cloud_audit_report.xlsx
 
-with styled, structured data per AWS resource type, including EC2 and Lambda audit results.
+Tabs for each audited resource
 
----
+Includes details for EC2 and Lambda analysis
 
-## 🛡️ Security Notice
+Clearly marked idle/unused indicators
 
-* Your credentials are **not stored**
-* The script uses **read-only access**
-* Always use IAM users with **minimal permissions**
+🔒 Security Notice
+Credentials are not stored
 
----
+Uses read-only access
 
-## 📌 Roadmap
+Always use least-privilege IAM policies
 
-* [x] EC2 Audit (improved unused instance detection)
-* [x] Lambda Audit Module (compute resource analysis)
-* [x] Excel Export
-* [x] GUI Output Path Picker
-* [ ] S3 Bucket Audit
-* [ ] Multi-region Support
-* [ ] CLI argument support
+🧭 Roadmap
+ EC2 Audit (enhanced detection logic)
 
----
+ Lambda Audit Module
 
-## 🙌 Contributing
+ Excel Export with formatting
 
-We welcome PRs and issue reports! Just fork and submit your change.
+ GUI Output Directory Picker
 
----
+ S3 Bucket Audit
 
-## 📜 License
+ Multi-region AWS Support
 
+ CLI Argument Support
+
+🤝 Contributing
+We welcome all PRs and suggestions!
+
+Fork this repo
+
+Create a feature branch
+
+Submit a pull request
+
+📜 License
 MIT License © 2025
 
----
+📬 Contact
+Questions or feature requests?
 
-## ✉️ Contact
-
-Have feedback or feature requests? Open an issue or ping \[[vireshsolanki1027@gmail.com](mailto:vireshsolanki1027@gmail.com)].
-
-```
+📧 vireshsolanki1027@gmail.com
