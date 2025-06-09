@@ -18,11 +18,11 @@ from modules.compute_modules.ec2_checker import (
     check_instance_store_backed_amis,
     report_running_instance_costs,
 )
-from utils.excel_writer import save_report
 from modules.compute_modules.lambda_checker import audit_lambda_functions
+from modules.storage_modules.s3_checker import analyze_s3_buckets
+from utils.excel_writer import save_report
 
 
-# Ctrl+C clean exit
 def handle_sigint(signum, frame):
     print("\nInterrupted by user. Exiting.")
     sys.exit(0)
@@ -32,14 +32,13 @@ signal.signal(signal.SIGINT, handle_sigint)
 
 
 def print_welcome_banner(username=None):
-    banner = """
+    print("""
 ****************************************************
 *                                                  *
 *      WELCOME TO AUTOCloud Resource Auditor       *
 *                                                  *
 ****************************************************
-"""
-    print(banner)
+""")
     if username:
         print(f"Hello, {username}!\n")
 
@@ -81,13 +80,8 @@ def connect_to_aws(access_key, secret_key, region):
         sts_client = session.client('sts')
         identity = sts_client.get_caller_identity()
         username = extract_username_from_arn(identity.get('Arn', 'Unknown'))
-
-        print(f"\nConnected to AWS successfully!")
-        # print(f" Account: {identity.get('Account')}")
-        # print(f" User:    {username}\n")
-
+        print("\nConnected to AWS successfully!")
         return session, username
-
     except NoCredentialsError:
         print("Invalid credentials.")
         return None, None
@@ -118,7 +112,7 @@ def scan_resources_with_spinner(session, region, ami_days):
     with yaspin(text="Checking orphan snapshots...", color="cyan") as spinner:
         resource_data["Snapshots - Orphaned"] = check_orphan_snapshots(session, region)
         spinner.ok("✅")
-    
+
     with yaspin(text="Checking unattached ENIs...", color="cyan") as spinner:
         resource_data["ENIs - Unattached"] = check_unattached_enis(session, region)
         spinner.ok("✅")
@@ -134,17 +128,19 @@ def scan_resources_with_spinner(session, region, ami_days):
     with yaspin(text="Reporting running instance costs...", color="cyan") as spinner:
         resource_data["Running Instance Costs"] = report_running_instance_costs(session, region)
         spinner.ok("✅")
+
     with yaspin(text="Auditing Lambda functions...", color="cyan") as spinner:
-        lambda_results = audit_lambda_functions(session, region)
-        resource_data["Lambda - Functions"] = lambda_results
+        resource_data["Lambda - Functions"] = audit_lambda_functions(session, region)
         spinner.ok("✅")
 
+    with yaspin(text="Analyzing S3 buckets...", color="cyan") as spinner:
+        resource_data["S3 - Bucket Analysis"] = analyze_s3_buckets(session.client('s3'))
+        spinner.ok("✅")
 
     return resource_data
 
 
 def choose_output_directory():
-    # Launch PyQt file dialog in subprocess to fully suppress errors
     script = """
 import sys
 from PyQt5.QtWidgets import QApplication, QFileDialog
@@ -171,12 +167,11 @@ def main():
         return
 
     print_welcome_banner(username)
-
     resource_data = scan_resources_with_spinner(session, region, ami_days)
 
     print("\nScan complete!\n")
     for resource_name, items in resource_data.items():
-        print(f"{resource_name:<25}: {len(items)}")
+        print(f"{resource_name:<35}: {len(items)}")
 
     attempts = 0
     while attempts < 2:
