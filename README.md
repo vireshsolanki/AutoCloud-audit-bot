@@ -130,7 +130,7 @@ python audit_bot.py
 - [x] Snapshot Cleanup
 - [x] Excel Export with formatting
 - [x] GUI Output Directory Picker
-- [ ] **S3 Bucket Audit** (In Progress)
+- [x] S3 Bucket Audit 
 - [ ] Multi-region AWS Support
 - [ ] CLI Argument Support
 - [ ] RDS Instance Analysis
