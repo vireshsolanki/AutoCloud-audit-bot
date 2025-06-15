@@ -9,6 +9,10 @@ def write_resource_sheet(wb, resource_name, data):
         ws.append(["No data found."])
         return
 
+    if not isinstance(data, list) or not isinstance(data[0], dict):
+        ws.append(["Invalid data format."])
+        return
+
     headers = list(data[0].keys())
     ws.append(headers)
 
@@ -41,19 +45,20 @@ def write_resource_sheet(wb, resource_name, data):
         for col_idx, key in enumerate(headers, start=1):
             value = row_data.get(key, "")
 
-            # Inject versioning suggestion into Notes
-            if key == "Notes" and isinstance(value, list):
+            # Sanitize problematic types for Excel
+            if isinstance(value, dict):
+                value = str(value) if value else ""
+            elif key == "Notes" and isinstance(value, list):
                 if row_data.get("Versioning", "").lower() == "disabled":
                     value.append("Consider enabling object versioning.")
                 value = ', '.join(str(v) for v in value)
-
             elif isinstance(value, list):
                 value = ', '.join(str(v) for v in value)
 
             cell = ws.cell(row=row_idx, column=col_idx, value=value)
 
             # Font styling
-            if key.lower() in ["resource id", "resource_id", "bucket name"]:
+            if key.lower() in ["resource id", "resource_id", "bucket name", "db instance identifier"]:
                 cell.font = resource_id_font
             else:
                 cell.font = data_font
@@ -63,14 +68,13 @@ def write_resource_sheet(wb, resource_name, data):
             cell.border = thin_border
 
             # Conditional highlight
-            if key == "Used?" and str(value).lower() == "no":
+            if key.lower() in ["used?", "idle?", "underutilized?"] and str(value).lower() == "no":
                 cell.fill = highlight_fill
 
         # Alternate row coloring
         if row_idx % 2 == 0:
             for col in range(1, len(headers) + 1):
                 ws.cell(row=row_idx, column=col).fill = alt_fill
-
 
 def save_report(filename, resource_data_map):
     wb = Workbook()

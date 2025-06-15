@@ -20,8 +20,8 @@ from modules.compute_modules.ec2_checker import (
 )
 from modules.compute_modules.lambda_checker import audit_lambda_functions
 from modules.storage_modules.s3_checker import analyze_s3_buckets
+from modules.storage_modules.rds_checker import audit_rds_instances
 from utils.excel_writer import save_report
-
 
 def handle_sigint(signum, frame):
     print("\nInterrupted by user. Exiting.")
@@ -29,7 +29,6 @@ def handle_sigint(signum, frame):
 
 
 signal.signal(signal.SIGINT, handle_sigint)
-
 
 def print_welcome_banner(username=None):
     print("""
@@ -41,7 +40,6 @@ def print_welcome_banner(username=None):
 """)
     if username:
         print(f"Hello, {username}!\n")
-
 
 def get_aws_credentials():
     print("Enter your AWS credentials (Read-only IAM user):")
@@ -56,13 +54,11 @@ def get_aws_credentials():
 
     return access_key, secret_key, region, ami_days
 
-
 def extract_username_from_arn(arn: str) -> str:
     try:
         return arn.split('/')[-1]
     except Exception:
         return arn
-
 
 def connect_to_aws(access_key, secret_key, region):
     try:
@@ -92,7 +88,6 @@ def connect_to_aws(access_key, secret_key, region):
     except ClientError as e:
         print(f"❌ AWS error: {e}")
         return None, None
-
 
 def scan_resources_with_spinner(session, region, ami_days):
     resource_data = {}
@@ -143,8 +138,11 @@ def scan_resources_with_spinner(session, region, ami_days):
         resource_data["S3 - Bucket Analysis"] = analyze_s3_buckets(s3_client, cloudtrail_client)
         spinner.ok("✅")
 
-    return resource_data
+    with yaspin(text="Auditing RDS instances...", color="cyan") as spinner:
+        resource_data["RDS - Instances"] = audit_rds_instances(session, region)
+        spinner.ok("✅")
 
+    return resource_data
 
 def choose_output_directory():
     script = """
@@ -162,7 +160,6 @@ app.quit()
     except KeyboardInterrupt:
         print("\nInterrupted during folder selection.")
         sys.exit(0)
-
 
 def main():
     access_key, secret_key, region, ami_days = get_aws_credentials()
@@ -195,7 +192,6 @@ def main():
     file_path = os.path.join(output_dir, "cloud_audit_report.xlsx")
     save_report(file_path, resource_data)
     print(f"\nReport saved to: {file_path}")
-
 
 if __name__ == "__main__":
     main()
