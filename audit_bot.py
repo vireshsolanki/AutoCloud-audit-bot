@@ -49,16 +49,10 @@ def get_aws_credentials():
         access_key = input("Access Key ID: ").strip()
         secret_key = pwinput.pwinput(prompt="Secret Access Key: ", mask="*").strip()
         region = input("Region [default: us-east-1]: ").strip() or "us-east-1"
-        ami_days_input = input("Days threshold for old AMIs [default: 30]: ").strip()
+        ami_days = 30  # Default value
     except KeyboardInterrupt:
         print("\nInterrupted by user. Exiting.")
         sys.exit(0)
-
-    try:
-        ami_days = int(ami_days_input) if ami_days_input else 30
-    except ValueError:
-        print(" Invalid AMI days, using default of 30.")
-        ami_days = 30
 
     return access_key, secret_key, region, ami_days
 
@@ -77,16 +71,26 @@ def connect_to_aws(access_key, secret_key, region):
             aws_secret_access_key=secret_key,
             region_name=region
         )
+
+        ec2 = session.client("ec2", region_name=region)
+        available_regions = [r['RegionName'] for r in ec2.describe_regions(AllRegions=True)['Regions']]
+        if region not in available_regions:
+            print(f"\n❌ '{region}' is not a valid AWS region.")
+            print("✔️ Available regions include:")
+            print(", ".join(sorted(available_regions)))
+            return None, None
+
         sts_client = session.client('sts')
         identity = sts_client.get_caller_identity()
         username = extract_username_from_arn(identity.get('Arn', 'Unknown'))
         print("\nConnected to AWS successfully!")
         return session, username
+
     except NoCredentialsError:
-        print("Invalid credentials.")
+        print("❌ Invalid credentials.")
         return None, None
     except ClientError as e:
-        print(f"AWS error: {e}")
+        print(f"❌ AWS error: {e}")
         return None, None
 
 
@@ -134,7 +138,9 @@ def scan_resources_with_spinner(session, region, ami_days):
         spinner.ok("✅")
 
     with yaspin(text="Analyzing S3 buckets...", color="cyan") as spinner:
-        resource_data["S3 - Bucket Analysis"] = analyze_s3_buckets(session.client('s3'))
+        s3_client = session.client('s3')
+        cloudtrail_client = session.client('cloudtrail')
+        resource_data["S3 - Bucket Analysis"] = analyze_s3_buckets(s3_client, cloudtrail_client)
         spinner.ok("✅")
 
     return resource_data

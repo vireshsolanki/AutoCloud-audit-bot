@@ -2,7 +2,6 @@ from openpyxl import Workbook
 from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
 from openpyxl.utils import get_column_letter
 
-
 def write_resource_sheet(wb, resource_name, data):
     ws = wb.create_sheet(title=resource_name)
 
@@ -41,8 +40,16 @@ def write_resource_sheet(wb, resource_name, data):
     for row_idx, row_data in enumerate(data, start=2):
         for col_idx, key in enumerate(headers, start=1):
             value = row_data.get(key, "")
-            if isinstance(value, list):
+
+            # Inject versioning suggestion into Notes
+            if key == "Notes" and isinstance(value, list):
+                if row_data.get("Versioning", "").lower() == "disabled":
+                    value.append("Consider enabling object versioning.")
                 value = ', '.join(str(v) for v in value)
+
+            elif isinstance(value, list):
+                value = ', '.join(str(v) for v in value)
+
             cell = ws.cell(row=row_idx, column=col_idx, value=value)
 
             # Font styling
