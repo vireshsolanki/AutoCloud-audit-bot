@@ -10,9 +10,10 @@ AutoCloud Audit Bot is a hybrid command-line + GUI Python tool designed to analy
 - ✅ **Unassociated Elastic IPs**
 - ✅ **Orphan Snapshots**
 - ✅ **Unused or Idle Lambda Functions** (new compute module)
+- ✅ **S3 Bucket Audit** *(requires S3 Access Logs or CloudTrail)*
 
-🔍 **Currently implemented:** EC2, Lambda, EBS, AMI, Elastic IP, and Snapshot modules  
-📦 **Next module:** S3 Bucket Audit
+🔍 **Currently implemented:** EC2, Lambda, EBS, AMI, Elastic IP, Snapshot modules  
+🪣 **S3 Bucket Audit** *(requires S3 Access Logs or CloudTrail to be enabled)*
 
 ---
 
@@ -28,22 +29,23 @@ AutoCloud Audit Bot is a hybrid command-line + GUI Python tool designed to analy
 - 🖼️ **AMI lifecycle management** for old and unused images
 - 🌐 **Elastic IP optimization** for cost savings
 - 📸 **Snapshot cleanup** for orphaned backups
+- 🪣 **S3 Audit** for bucket usage insights *(requires S3 Access Logs or CloudTrail)*
 
 ---
 
 ## 🛠️ Development Status
 
-| Module | Status |
-|--------|--------|
-| EC2 Audit | ✅ **Fully implemented** |
-| Lambda Audit | ✅ **Implemented** |
-| EBS Volumes | ✅ **Completed** |
-| AMIs | ✅ **Completed** |
-| Elastic IPs | ✅ **Completed** |
-| Snapshots | ✅ **Completed** |
-| Excel Export | ✅ **Styled report output** |
-| GUI Folder Picker | ✅ **Cross-platform GUI** |
-| **S3 Bucket Audit** | 🚧 **Coming Next** |
+| Module                  | Status                                    |
+|-------------------------|-------------------------------------------|
+| EC2 Audit               | ✅ **Fully implemented**                  |
+| Lambda Audit            | ✅ **Implemented**                        |
+| EBS Volumes             | ✅ **Completed**                          |
+| AMIs                    | ✅ **Completed**                          |
+| Elastic IPs             | ✅ **Completed**                          |
+| Snapshots               | ✅ **Completed**                          |
+| Excel Export            | ✅ **Styled report output**               |
+| GUI Folder Picker       | ✅ **Cross-platform GUI**                 |
+| S3 Bucket Audit         | ✅ **Requires CloudTrail or S3 Access Logs** |
 
 ---
 
