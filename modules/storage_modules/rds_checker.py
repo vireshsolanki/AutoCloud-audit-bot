@@ -129,8 +129,8 @@ def check_rds_proxies(session, region):
     return results
 def audit_rds_instances(session, region):
     return {
-        "RDS Instances": check_rds_utilization(session, region),
-        "RDS Snapshots": list_rds_snapshots(session, region),
-        "RDS Performance Insights": analyze_performance_insights(session, region),
-        "RDS Proxies": check_rds_proxies(session, region)
+        "RDS Instances": check_rds_utilization(session, region) or [],
+        "RDS Snapshots": list_rds_snapshots(session, region) or [],
+        "RDS Performance Insights": analyze_performance_insights(session, region) or [],
+        "RDS Proxies": check_rds_proxies(session, region) or []
     }

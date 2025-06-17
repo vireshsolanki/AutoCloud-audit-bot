@@ -21,7 +21,7 @@ from modules.compute_modules.ec2_checker import (
 from modules.compute_modules.lambda_checker import audit_lambda_functions
 from modules.storage_modules.s3_checker import analyze_s3_buckets
 from modules.storage_modules.rds_checker import audit_rds_instances
-from utils.excel_writer import save_report
+from features.excel_writer import save_report
 
 def handle_sigint(signum, frame):
     print("\nInterrupted by user. Exiting.")

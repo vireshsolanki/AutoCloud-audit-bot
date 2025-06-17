@@ -3,7 +3,8 @@ from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
 from openpyxl.utils import get_column_letter
 
 def write_resource_sheet(wb, resource_name, data):
-    ws = wb.create_sheet(title=resource_name)
+    safe_title = resource_name[:31]  # Excel title limit
+    ws = wb.create_sheet(title=safe_title)
 
     if not data:
         ws.append(["No data found."])
@@ -47,7 +48,7 @@ def write_resource_sheet(wb, resource_name, data):
 
             # Sanitize problematic types for Excel
             if isinstance(value, dict):
-                value = str(value) if value else ""
+                value = str(value)
             elif key == "Notes" and isinstance(value, list):
                 if row_data.get("Versioning", "").lower() == "disabled":
                     value.append("Consider enabling object versioning.")
@@ -63,7 +64,6 @@ def write_resource_sheet(wb, resource_name, data):
             else:
                 cell.font = data_font
 
-            # Borders and alignment
             cell.alignment = alignment
             cell.border = thin_border
 
@@ -81,7 +81,14 @@ def save_report(filename, resource_data_map):
     wb.remove(wb.active)  # Remove default blank sheet
 
     for resource_name, data in resource_data_map.items():
-        if data:  # Only add sheet if there's data
-            write_resource_sheet(wb, resource_name, data)
+        if resource_name == "RDS - Instances" and isinstance(data, dict):
+            # Handle nested structure from audit_rds_instances()
+            for sub_key, sub_data in data.items():
+                if isinstance(sub_data, list) and sub_data:
+                    sheet_title = f"RDS - {sub_key}"[:31]  # Excel limit
+                    write_resource_sheet(wb, sheet_title, sub_data)
+        elif isinstance(data, list) and data:
+            sheet_title = resource_name[:31]  # Excel limit
+            write_resource_sheet(wb, sheet_title, data)
 
     wb.save(filename)
