@@ -21,6 +21,7 @@ from modules.compute_modules.ec2_checker import (
 from modules.compute_modules.lambda_checker import audit_lambda_functions
 from modules.storage_modules.s3_checker import analyze_s3_buckets
 from modules.storage_modules.rds_checker import audit_rds_instances
+from modules.storage_modules.efs_checker import check_efs_usage
 from features.excel_writer import save_report
 
 def handle_sigint(signum, frame):
@@ -140,6 +141,10 @@ def scan_resources_with_spinner(session, region, ami_days):
 
     with yaspin(text="Auditing RDS instances...", color="cyan") as spinner:
         resource_data["RDS - Instances"] = audit_rds_instances(session, region)
+        spinner.ok("✅")
+    
+    with yaspin(text="Auditing EFS file systems...", color="cyan") as spinner:
+        resource_data["EFS - File Systems"] = check_efs_usage(session, region)
         spinner.ok("✅")
 
     return resource_data
